@@ -2,13 +2,13 @@
 
 
 
-int main(/*int argc, char* argv[]*/) {
-    
+int main(int argc, char* argv[]) 
+{
+    FILE * file = fopen(argv[argc-1], "rw");    
     initBuffer();
-    for(int i = 0; i < 20; i++)
-    {
-        writeToBuffer(getchar());
-    }
+
+    readFileToBuffer(file);
+
     display();
     destroyBuffer();
     return 0;

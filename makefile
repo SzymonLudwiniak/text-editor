@@ -6,7 +6,7 @@ GXX = gcc
 FLAGS = -Wall -Wextra -g
 TARGET = $(BIN)/main
 LINK = `sdl2-config --cflags --libs` -lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf
-
+ARGS = testowy.txt
 
 all:	clean build run
 
@@ -17,7 +17,15 @@ clean:
 	rm -f $(BIN)/*
 
 run: $(TARGET)
-	$(TARGET)
+	$(TARGET) $(ARGS)
 
 debug: $(TARGET)
-	gdb $(TARGET)
+	gdb $(TARGET) --args $(ARGS)
+
+memtest: $(TARGET)
+	valgrind --leak-check=full \
+         --show-leak-kinds=all \
+         --track-origins=yes \
+         --verbose \
+         --log-file=valgrind-out.txt \
+		 $(TARGET) $(ARGS)
