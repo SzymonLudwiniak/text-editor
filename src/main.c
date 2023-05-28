@@ -1,15 +1,25 @@
-#include "../include/buffer.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
+#include "../include/buffer.h"
 
 
 int main(int argc, char* argv[]) 
 {
-    FILE * file = fopen(argv[argc-1], "rw");    
+
     initBuffer();
+    FILE* f = fopen(argv[argc-1], "rw");
+    readFileToBuffer(f);
+    fclose(f);
+    setFirstVisibleLine(1);
+    setLastVisibleLine(2);
+    char *ptr = (char*)malloc(sizeof(char)*256);
+    getVisibleText(&ptr);
 
-    readFileToBuffer(file);
+    printf("%s", ptr);
 
-    display();
+    free(ptr);
+
     destroyBuffer();
     return 0;
 }

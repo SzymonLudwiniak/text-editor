@@ -1,9 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "../include/buffer.h"
 
 #define BLOCKSIZE 0x04
+#define VISIBLEBLOCKWIDTH 0xFF
 
 
 struct sTextBuffer
@@ -11,10 +13,13 @@ struct sTextBuffer
     char * buffer;
     unsigned int size;
     unsigned int cPos;
+
+    unsigned int visIndexStart;
+    unsigned int visIndexEnd;
 };
 
 
-static struct sTextBuffer textBuffer = {NULL, 0, 0};
+static struct sTextBuffer textBuffer = {NULL, 0, 0, 0, 0};
 
 
 void initBuffer()
@@ -56,6 +61,48 @@ int writeToBuffer(char ch)
 void destroyBuffer()
 {
     free(textBuffer.buffer);
+}
+
+char* getVisibleText(char **ptr)
+{
+    char * temp = strncpy(*ptr, (textBuffer.buffer + textBuffer.visIndexStart), textBuffer.visIndexEnd-textBuffer.visIndexStart);
+    temp[textBuffer.visIndexEnd-textBuffer.visIndexStart] = '\0';
+
+    return 0;
+}
+
+int setFirstVisibleLine(unsigned int num)
+{
+    unsigned int line = 0;
+    unsigned int i;
+    for(i = 0; i < textBuffer.size; i++)
+    {
+        if(textBuffer.buffer[i] == '\n')
+            line++;
+        if(line == num)
+            break;
+    }
+    if(line != 0) 
+        i++;
+    textBuffer.visIndexStart = i;
+    printf("first %d\n", i);
+    return i;
+}
+
+int setLastVisibleLine(unsigned int num)
+{
+    unsigned int line = 0;
+    unsigned int i;
+    for(i = 0; i < textBuffer.size; i++)
+    {
+        if(textBuffer.buffer[i] == '\n')
+            line++;
+        if(line == num+1)
+            break;
+    }
+    textBuffer.visIndexEnd = i;
+    printf("last %d\n", i);
+    return i;
 }
 
 void display()

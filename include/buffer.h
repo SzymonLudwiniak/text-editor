@@ -8,10 +8,15 @@
 struct sTextBuffer;
 
 void initBuffer();
+
 int readFileToBuffer(FILE * f);
 int writeToBuffer(char ch);
 void destroyBuffer();
 
+char* getVisibleText(char **ptr);
+
+int setFirstVisibleLine(unsigned int num);
+int setLastVisibleLine(unsigned int num);
 
 void display();
 
