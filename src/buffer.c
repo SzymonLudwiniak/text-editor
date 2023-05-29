@@ -47,10 +47,9 @@ int writeToBuffer(char ch)
     if(textBuffer.cPos == textBuffer.size)
     {
         char * temp_p = realloc(textBuffer.buffer, sizeof(char)*(textBuffer.size + BLOCKSIZE));
-        textBuffer.size += BLOCKSIZE;
         if(temp_p == NULL)
             return -1;
-
+        textBuffer.size += BLOCKSIZE;
         textBuffer.buffer = temp_p;
         retVal = 1;
     }
