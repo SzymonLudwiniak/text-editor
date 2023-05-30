@@ -6,6 +6,8 @@
 #define SCREENWIDTH     800
 #define SCREENHEIGHT    600
 
+#define BGCOLOR_RGBA 7, 40, 69, 255
+
 
 int main(int argc, char* argv[]) 
 {
@@ -16,7 +18,7 @@ int main(int argc, char* argv[])
     fclose(f);
 
     setFirstVisibleLine(0);
-    setLastVisibleLine(64);
+    setLastVisibleLine(32);
 
     //  SDL PART  //
     SDL_Init(SDL_INIT_VIDEO);
@@ -25,18 +27,26 @@ int main(int argc, char* argv[])
     SDL_Window * window = SDL_CreateWindow("text-editor", 1600, SDL_WINDOWPOS_UNDEFINED, SCREENWIDTH, SCREENHEIGHT, SDL_WINDOW_RESIZABLE);
     SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
+    SDL_SetRenderDrawColor(renderer, BGCOLOR_RGBA);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
+
     TTF_Font * font = TTF_OpenFont("fonts/Roundman.ttf", 16);
-    SDL_Color color = {255, 255, 255, 0};
+    SDL_Color color = {248, 242, 73, 0};
 
     SDL_Surface * textSurface = TTF_RenderText_Blended_Wrapped(font, getVisibleBuffer(), color, SCREENWIDTH);
     SDL_Surface * colorSurface = SDL_CreateRGBSurfaceWithFormat(0, textSurface->w, textSurface->h, 32, textSurface->format->format);
 
-    SDL_FillRect(colorSurface, NULL, SDL_MapRGBA(colorSurface->format, 127, 127, 127, 127));
+    SDL_FillRect(colorSurface, NULL, SDL_MapRGBA(colorSurface->format, BGCOLOR_RGBA));
 
 
     SDL_BlitSurface(textSurface, NULL, colorSurface, NULL);
 
-    SDL_BlitSurface(colorSurface, NULL, SDL_GetWindowSurface(window), NULL);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, colorSurface);
+    SDL_Rect srcRect = {0, 0, colorSurface->w, colorSurface->h};
+    SDL_Rect destRect = {10, 0, colorSurface->w, colorSurface->h};
+    SDL_RenderCopy(renderer, texture, &srcRect, &destRect);
+    SDL_RenderPresent(renderer);
 
     if(font == NULL)
     {
