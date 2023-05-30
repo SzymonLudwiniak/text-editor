@@ -2,11 +2,15 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "../include/buffer.h"
+#include "../include/cursor.h"
 
 #define SCREENWIDTH     800
 #define SCREENHEIGHT    600
 
 #define BGCOLOR_RGBA 7, 40, 69, 255
+
+#define TEXT_COLOR  {248, 242, 73, 0}
+#define TEXT_BGCOLOR {7, 40, 69, 255}
 
 
 int main(int argc, char* argv[]) 
@@ -25,16 +29,17 @@ int main(int argc, char* argv[])
     TTF_Init();
 
     SDL_Window * window = SDL_CreateWindow("text-editor", 1600, SDL_WINDOWPOS_UNDEFINED, SCREENWIDTH, SCREENHEIGHT, SDL_WINDOW_RESIZABLE);
-    SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     SDL_SetRenderDrawColor(renderer, BGCOLOR_RGBA);
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
 
-    TTF_Font * font = TTF_OpenFont("fonts/Roundman.ttf", 16);
-    SDL_Color color = {248, 242, 73, 0};
+    TTF_Font * font = TTF_OpenFont("fonts/Roboto.ttf", 16);
 
-    SDL_Surface * textSurface = TTF_RenderText_Blended_Wrapped(font, getVisibleBuffer(), color, SCREENWIDTH);
+    SDL_Color textColor = TEXT_COLOR;
+
+    SDL_Surface * textSurface = TTF_RenderText_Blended_Wrapped(font, getVisibleBuffer(), textColor, SCREENWIDTH);
     SDL_Surface * colorSurface = SDL_CreateRGBSurfaceWithFormat(0, textSurface->w, textSurface->h, 32, textSurface->format->format);
 
     SDL_FillRect(colorSurface, NULL, SDL_MapRGBA(colorSurface->format, BGCOLOR_RGBA));
@@ -45,8 +50,8 @@ int main(int argc, char* argv[])
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, colorSurface);
     SDL_Rect srcRect = {0, 0, colorSurface->w, colorSurface->h};
     SDL_Rect destRect = {10, 0, colorSurface->w, colorSurface->h};
-    SDL_RenderCopy(renderer, texture, &srcRect, &destRect);
-    SDL_RenderPresent(renderer);
+
+    initCursor(renderer);
 
     if(font == NULL)
     {
@@ -65,7 +70,10 @@ int main(int argc, char* argv[])
             if( event.type == SDL_QUIT)
                 quit = 1;
         }
-        SDL_UpdateWindowSurface(window);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, texture, &srcRect, &destRect);
+        drawCursor(renderer);
+        SDL_RenderPresent(renderer);
     }
 
     SDL_FreeSurface(colorSurface);
@@ -79,6 +87,7 @@ int main(int argc, char* argv[])
     SDL_Quit();
     ///////////////////////////////////////
 
+    destroyCursor();
     destroyBuffer();
     return 0;
 }
