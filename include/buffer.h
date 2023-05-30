@@ -14,6 +14,7 @@ int writeToBuffer(char ch);
 void destroyBuffer();
 
 char* getVisibleText(char **ptr);
+char* getVisibleBuffer();
 
 int setFirstVisibleLine(unsigned int num);
 int setLastVisibleLine(unsigned int num);

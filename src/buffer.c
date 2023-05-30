@@ -5,12 +5,13 @@
 #include "../include/buffer.h"
 
 #define BLOCKSIZE 0x04
-#define VISIBLEBLOCKWIDTH 0xFF
 
 
 struct sTextBuffer
 {
     char * buffer;
+    char * visibleBuffer;
+
     unsigned int size;
     unsigned int cPos;
 
@@ -19,7 +20,7 @@ struct sTextBuffer
 };
 
 
-static struct sTextBuffer textBuffer = {NULL, 0, 0, 0, 0};
+static struct sTextBuffer textBuffer = {NULL, NULL, 0, 0, 0, 0};
 
 
 void initBuffer()
@@ -46,7 +47,7 @@ int writeToBuffer(char ch)
     // if true we need to allocate more space
     if(textBuffer.cPos == textBuffer.size)
     {
-        char * temp_p = realloc(textBuffer.buffer, sizeof(char)*(textBuffer.size + BLOCKSIZE));
+        char * temp_p = realloc(textBuffer.buffer, sizeof(*textBuffer.buffer)*(textBuffer.size + BLOCKSIZE));
         if(temp_p == NULL)
             return -1;
         textBuffer.size += BLOCKSIZE;
@@ -68,6 +69,17 @@ char* getVisibleText(char **ptr)
     temp[textBuffer.visIndexEnd-textBuffer.visIndexStart] = '\0';
 
     return 0;
+}
+
+char* getVisibleBuffer()
+{
+    // its so big :0
+    textBuffer.visibleBuffer = (char*)malloc(sizeof(*textBuffer.visibleBuffer)*textBuffer.visIndexEnd-textBuffer.visIndexStart + 1);
+    textBuffer.visibleBuffer = strncpy(textBuffer.visibleBuffer, (textBuffer.buffer + textBuffer.visIndexStart),
+                                       textBuffer.visIndexEnd-textBuffer.visIndexStart);
+    textBuffer.visibleBuffer[textBuffer.visIndexEnd-textBuffer.visIndexStart] = '\0';
+
+    return textBuffer.visibleBuffer;
 }
 
 int setFirstVisibleLine(unsigned int num)
